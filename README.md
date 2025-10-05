@@ -1,4 +1,4 @@
-🎬 HackUTA AI Cinematic Generator
+🎬 Memora AI Cinematic Generator
 🧠 Overview
 
 HackUTA AI Cinematic Generator is an advanced AI-powered Flask application that transforms static images into dynamic cinematic videos.
