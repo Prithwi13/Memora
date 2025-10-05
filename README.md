@@ -1,60 +1,85 @@
-# 🎬 Memora - AI Photo to Reel Generator
+🎬 HackUTA AI Cinematic Generator
+🧠 Overview
 
-Transform your photos into stunning Instagram reels using AI-powered sentiment analysis and video generation.
+HackUTA AI Cinematic Generator is an advanced AI-powered Flask application that transforms static images into dynamic cinematic videos.
+The system integrates BERT5, Gemini 2.5 Flash, and a Retrieval-Augmented Generation (RAG) Database to intelligently generate emotional, context-driven video stories — complete with visuals, transitions, and background audio.
 
-## Features
+🚀 Workflow
+📸 Photo Upload
+↓
+🤖 BERT5 Model
+→ Extracts sentiment, mood, and contextual meaning from uploaded images
+↓
+🧠 RAG Database
+→ Matches extracted context to the most suitable specialized prompt
+↓
+✨ Gemini 2.5 Flash (Image Generation)
+→ Generates stylized cinematic frames from refined prompts and images
+↓
+🎞️ MoviePy
+→ Combines all generated frames, transitions, and audio into a final MP4 video
 
-- **AI Sentiment Analysis**: Uses BERT5 model to analyze photo sentiment and context
-- **RAG Database**: Intelligent prompt matching for optimal video generation
-- **Gemini Integration**: Leverages Gemini 2.5 Flash Image for creative video scripting
-- **MoviePy Video Creation**: Professional video editing with background music
-- **Modern UI**: High-quality 2025 Streamlit interface
+➡️ Final Output: A complete cinematic video stored in the outputs/ folder.
 
-## Installation
+⚙️ Features
 
-1. Install dependencies:
-```bash
+🧩 AI-Powered Context Extraction: Uses BERT5 to understand emotion, tone, and meaning from multiple images together.
+
+🧠 Intelligent RAG Matching: Dynamically selects prompts that align with detected sentiment and visual content.
+
+🎨 Gemini 2.5 Flash Integration: Produces artistic, frame-level cinematic imagery guided by the selected prompt.
+
+🎬 Automatic Video Composition: Uses MoviePy to combine generated visuals and sound into a cohesive short film.
+
+🌐 Web Interface via Flask: Intuitive interface to upload images and preview generated results locally.
+
+🏗️ Project Structure
+hackuta-main/
+│
+├── app.py # Flask main application
+├── config.py # Config settings for API and model paths
+├── rag*database.json # RAG database with specialized prompts
+├── requirements.txt # Python dependencies
+│
+├── templates/ # Frontend HTML templates
+├── static/ # Static assets (CSS, JS, etc.)
+├── uploads/ # Temporary image uploads
+├── outputs/ # Generated MP4 video outputs
+│
+├── services/ # Internal services for AI processing
+└── test*\*.py # Test scripts for components
+
+⚙️ Setup Instructions
+
+1. Clone the repository
+   git clone https://github.com/yourusername/hackuta-main.git
+   cd hackuta-main
+
+2. Install dependencies
+
+Make sure Python 3.9+ is installed:
+
 pip install -r requirements.txt
-```
 
-2. Set up environment variables:
-```bash
-# Create .env file with your Gemini API key
-GEMINI_API_KEY=your_api_key_here
-```
+3. Run the application
+   python3 app.py
 
-3. Run the application:
-```bash
-streamlit run app.py
-```
+App will run on
+👉 http://localhost:5003
 
-## Usage
+🧠 Tech Stack
+Component Technology
+Frontend Flask, HTML, CSS, JavaScript
+Backend Python
+AI Models BERT5 (sentiment/context extraction)
+Retrieval System RAG (specialized cinematic prompts)
+Image Generation Gemini 2.5 Flash
+Video Rendering MoviePy
+Storage Local filesystem (uploads/outputs)
+📦 Output
 
-1. Upload your photos
-2. AI analyzes sentiment and context
-3. RAG database matches optimal prompts
-4. Gemini generates video script
-5. MoviePy creates your Instagram reel
-6. Download and share!
+Generated cinematic videos are saved in:
 
-## API Keys
+outputs/
 
-- **Gemini API**: Get your API key from [Google AI Studio](https://makersuite.google.com/app/apikey)
-
-## Music Assets
-
-Place your background music files in `assets/music/`:
-- `upbeat_electronic.mp3`
-- `chill_ambient.mp3`
-- `happy_pop.mp3`
-- `romantic_piano.mp3`
-- `adventure_cinematic.mp3`
-
-## Tech Stack
-
-- **Frontend**: Streamlit
-- **AI Models**: BERT5, Gemini 2.5 Flash
-- **Video Processing**: MoviePy
-- **Database**: ChromaDB
-- **Embeddings**: Sentence Transformers
-
+Each file is named automatically (e.g., generated_video_001.mp4).
