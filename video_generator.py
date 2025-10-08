@@ -5,13 +5,16 @@ from PIL import Image
 import tempfile
 import os
 import streamlit as st
+import numpy as np
 from config import GEMINI_API_KEY
+from ai_narrator import AINarrator
 
 class VideoGenerator:
     def __init__(self):
         """Initialize the video generator with Gemini API"""
         genai.configure(api_key=GEMINI_API_KEY)
         self.model = genai.GenerativeModel('gemini-2.0-flash-exp')
+        self.narrator = AINarrator()
     
     def create_reel(self, analysis_results, music_style="Upbeat", duration=30, style="Modern"):
         """
@@ -27,18 +30,29 @@ class VideoGenerator:
             Path to the generated video file
         """
         try:
+            st.info("🎬 Starting video generation process...")
+            
             # Generate video script using Gemini
+            st.info("🤖 Step 1: Generating video script with Gemini AI...")
             script = self._generate_video_script(analysis_results, style, duration)
             
             # Create video clips from images
+            st.info("🎞️ Step 2: Creating video clips from images...")
             clips = self._create_video_clips(analysis_results, script, duration)
             
-            # Add background music
-            final_video = self._add_background_music(clips, music_style, duration)
+            # Generate AI narration
+            st.info("🎤 Step 3: Generating AI narration...")
+            narration_path = self.narrator.generate_narration(script, analysis_results[0]['sentiment'])
+            
+            # Add background music and narration
+            st.info("🎵 Step 4: Adding background music and narration...")
+            final_video = self._add_background_music(clips, music_style, duration, narration_path)
             
             # Save video
+            st.info("💾 Step 5: Saving final video...")
             output_path = self._save_video(final_video)
             
+            st.success("🎉 Video generation completed successfully!")
             return output_path
             
         except Exception as e:
@@ -48,6 +62,8 @@ class VideoGenerator:
     def _generate_video_script(self, analysis_results, style, duration):
         """Generate video script using Gemini AI"""
         try:
+            st.info("🤖 Calling Gemini AI to generate video script...")
+            
             # Prepare context for Gemini
             context = f"""
             Create a video script for an Instagram reel with the following specifications:
@@ -80,13 +96,18 @@ class VideoGenerator:
             """
             
             # Generate script using Gemini
+            st.info("📡 Sending request to Gemini API...")
             response = self.model.generate_content(context)
             script = response.text
+            
+            st.success("✅ Gemini AI script generated successfully!")
+            st.info(f"📝 Generated script preview: {script[:200]}...")
             
             return script
             
         except Exception as e:
-            st.warning(f"Gemini script generation failed: {e}")
+            st.error(f"❌ Gemini script generation failed: {e}")
+            st.warning("🔄 Using fallback script...")
             # Fallback to basic script
             return self._create_fallback_script(analysis_results, duration)
     
@@ -129,33 +150,35 @@ class VideoGenerator:
                 # Resize to Instagram standard (9:16 aspect ratio)
                 clip = clip.resize(height=1080)
                 
-                # Apply enhanced effects based on sentiment for shorter duration
+                # Apply modern 2025 Instagram reel effects
                 if result['sentiment'] == 'Positive':
-                    # Dynamic zoom with rotation for positive images
-                    clip = clip.resize(lambda t: 1 + 0.3 * t / clip_duration)
-                    clip = clip.rotate(lambda t: 2 * t / clip_duration)  # Subtle rotation
-                    # Add brightness and saturation boost
-                    clip = clip.fx(mp.vfx.colorx, 1.3)
+                    # Ken Burns effect with smooth pan and zoom
+                    clip = clip.resize(lambda t: 1 + 0.15 * np.sin(t * np.pi / clip_duration))
+                    # Add vibrant color grading
+                    clip = clip.fx(mp.vfx.colorx, 1.2)
+                    # Add subtle glow effect
+                    clip = clip.fx(mp.vfx.lum_contrast, 1.1, 1.05)
                 elif result['sentiment'] == 'Negative':
-                    # Dramatic zoom with fade for negative images
-                    clip = clip.resize(lambda t: 1 + 0.4 * t / clip_duration)
-                    # Add dramatic contrast and darkening
-                    clip = clip.fx(mp.vfx.colorx, 0.7)
+                    # Cinematic slow zoom with dramatic lighting
+                    clip = clip.resize(lambda t: 1 + 0.1 * t / clip_duration)
+                    # Add moody color grading
+                    clip = clip.fx(mp.vfx.colorx, 0.8)
+                    clip = clip.fx(mp.vfx.lum_contrast, 0.9, 1.2)
                 else:
-                    # Smooth zoom with slight pan for neutral
-                    clip = clip.resize(lambda t: 1 + 0.2 * t / clip_duration)
-                    # Add subtle color enhancement
-                    clip = clip.fx(mp.vfx.colorx, 1.1)
+                    # Smooth parallax effect
+                    clip = clip.resize(lambda t: 1 + 0.08 * np.sin(t * 2 * np.pi / clip_duration))
+                    # Add clean, modern color grading
+                    clip = clip.fx(mp.vfx.colorx, 1.05)
                 
-                # Add fade effects
+                # Add modern fade effects
                 if i == 0:
-                    clip = clip.fadein(0.8)
+                    clip = clip.fadein(0.5)  # Quick fade in
                 if i == len(analysis_results) - 1:
-                    clip = clip.fadeout(0.8)
+                    clip = clip.fadeout(0.5)  # Quick fade out
                 
-                # Add crossfade transitions between clips
+                # Add smooth crossfade transitions between clips
                 if i > 0:
-                    clip = clip.fadein(0.3)
+                    clip = clip.fadein(0.2)  # Subtle crossfade
                 
                 clips.append(clip)
                 
@@ -191,57 +214,105 @@ class VideoGenerator:
         
         return clips
     
-    def _add_background_music(self, clips, music_style, duration):
-        """Add background music to the video"""
+    def _add_background_music(self, clips, music_style, duration, narration_path=None):
+        """Add background music and narration to the video"""
         try:
             # Check if clips list is empty
             if not clips:
                 st.error("No video clips were created. Please check your images.")
                 return None
             
-            # Concatenate video clips with crossfade transitions
+            # Concatenate video clips with smooth transitions
             if len(clips) == 1:
                 final_video = clips[0]
             else:
-                final_video = mp.concatenate_videoclips(clips, method="compose", transition=0.5)
+                # Use compose method with shorter transition for modern look
+                final_video = mp.concatenate_videoclips(clips, method="compose", transition=0.3)
             
-            # Get the actual video duration
-            video_duration = final_video.duration
+            # Get the actual video duration - ensure it's a proper float
+            try:
+                video_duration = float(final_video.duration)
+                if video_duration <= 0:
+                    st.warning("Video duration is invalid, using default")
+                    video_duration = 30.0
+            except (AttributeError, TypeError, ValueError) as e:
+                st.warning(f"Could not get video duration: {e}, using default")
+                video_duration = 30.0
             
             # Get music path
             music_path = self._get_music_path(music_style)
             
             if music_path and os.path.exists(music_path):
                 try:
-                    # Load audio
+                    # Load audio with proper error handling
                     audio = mp.AudioFileClip(music_path)
                     
-                    # Adjust audio duration to match video
-                    if audio.duration > video_duration:
-                        audio = audio.subclip(0, video_duration)
-                    elif audio.duration < video_duration:
-                        # Loop audio if it's shorter than video
-                        loops_needed = int(video_duration / audio.duration) + 1
-                        audio = mp.concatenate_audioclips([audio] * loops_needed).subclip(0, video_duration)
+                    # Validate audio object
+                    if not hasattr(audio, 'duration'):
+                        st.warning("Audio file loaded but has no duration attribute")
+                        audio = mp.AudioClip(lambda t: 0, duration=video_duration)
+                    elif audio.duration is None or audio.duration <= 0:
+                        st.warning("Audio file has invalid duration")
+                        audio = mp.AudioClip(lambda t: 0, duration=video_duration)
+                    else:
+                        # Adjust audio duration to match video
+                        if audio.duration > video_duration:
+                            audio = audio.subclip(0, video_duration)
+                        elif audio.duration < video_duration:
+                            # Loop audio if it's shorter than video
+                            loops_needed = int(video_duration / audio.duration) + 1
+                            audio = mp.concatenate_audioclips([audio] * loops_needed).subclip(0, video_duration)
                     
-                    # Set audio volume (reduce to 40% to not overpower)
-                    audio = audio.volumex(0.4)
+                    # Set audio volume (reduce to 30% to leave room for narration)
+                    audio = audio.volumex(0.3)
                     
-                    # Add audio to video
-                    final_video = final_video.set_audio(audio)
-                    
-                    st.success(f"🎵 Added {music_style} background music")
+                    # Add narration if available
+                    if narration_path and os.path.exists(narration_path):
+                        try:
+                            st.info("🎤 Adding AI narration...")
+                            narration = mp.AudioFileClip(narration_path)
+                            
+                            # Adjust narration volume and duration
+                            narration = narration.volumex(0.8)  # Louder than music
+                            if narration.duration > video_duration:
+                                narration = narration.subclip(0, video_duration)
+                            
+                            # Mix narration with background music
+                            mixed_audio = mp.CompositeAudioClip([audio, narration])
+                            final_video = final_video.set_audio(mixed_audio)
+                            
+                            st.success("🎤 Added AI narration with background music")
+                            
+                        except Exception as narration_error:
+                            st.warning(f"Narration error: {narration_error}")
+                            # Use just background music
+                            final_video = final_video.set_audio(audio)
+                            st.success(f"🎵 Added {music_style} background music")
+                    else:
+                        # Add just background music
+                        final_video = final_video.set_audio(audio)
+                        st.success(f"🎵 Added {music_style} background music")
                     
                 except Exception as audio_error:
                     st.warning(f"Audio loading error: {audio_error}")
                     # Create silent audio track
-                    silent_audio = mp.AudioClip(lambda t: 0, duration=video_duration)
-                    final_video = final_video.set_audio(silent_audio)
+                    try:
+                        silent_audio = mp.AudioClip(lambda t: 0, duration=video_duration)
+                        final_video = final_video.set_audio(silent_audio)
+                    except Exception as silent_error:
+                        st.warning(f"Could not create silent audio: {silent_error}")
+                        # Return video without audio
+                        pass
             else:
                 st.warning(f"Music file not found: {music_path}")
                 # Create silent audio track
-                silent_audio = mp.AudioClip(lambda t: 0, duration=video_duration)
-                final_video = final_video.set_audio(silent_audio)
+                try:
+                    silent_audio = mp.AudioClip(lambda t: 0, duration=video_duration)
+                    final_video = final_video.set_audio(silent_audio)
+                except Exception as silent_error:
+                    st.warning(f"Could not create silent audio: {silent_error}")
+                    # Return video without audio
+                    pass
             
             return final_video
             

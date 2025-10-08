@@ -82,3 +82,4 @@ The app is now running at `http://localhost:8501` with:
 - **Silent Videos**: Professional videos without background music
 - **Better Performance**: Faster video generation without audio processing
 - **Clean Code**: Removed complex music loading logic
+

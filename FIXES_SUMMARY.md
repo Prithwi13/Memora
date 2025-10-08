@@ -97,3 +97,4 @@ The application now features:
 - **Visual**: Enhanced effects and transitions
 - **UX**: Clean, single-section interface
 - **Performance**: Optimized for short-form content
+

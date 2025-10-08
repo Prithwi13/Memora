@@ -58,3 +58,4 @@ Place your background music files in `assets/music/`:
 - **Database**: ChromaDB
 - **Embeddings**: Sentence Transformers
 
+

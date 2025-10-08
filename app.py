@@ -279,36 +279,15 @@ def main():
     # Settings in main area
     st.markdown("### ⚙️ Settings")
     
-    col1, col2, col3 = st.columns(3)
-    
-    with col1:
-        # Music selection
-        music_options = ["Upbeat", "Chill", "Happy", "Romantic", "Adventure"]
-        selected_music = st.selectbox(
-            "🎵 Music Style",
-            music_options,
-            help="Choose the music style for your reel"
-        )
-    
-    with col2:
-        # Video duration - shorter default
-        duration = st.slider(
-            "⏱️ Duration (seconds)",
-            min_value=10,
-            max_value=30,
-            value=15,
-            step=5,
-            help="Duration of the generated reel"
-        )
-    
-    with col3:
-        # Video style
-        style_options = ["Cinematic", "Vibrant", "Minimalist", "Retro", "Modern", "Artistic"]
-        video_style = st.selectbox(
-            "🎨 Video Style",
-            style_options,
-            help="Choose the visual style for your reel"
-        )
+    # Video duration - shorter default
+    duration = st.slider(
+        "⏱️ Duration (seconds)",
+        min_value=10,
+        max_value=30,
+        value=15,
+        step=5,
+        help="Duration of the generated reel"
+    )
     
     # Upload section - Single clean upload area
     st.markdown("### 📸 Upload Your Photos")
@@ -335,30 +314,36 @@ def main():
         st.markdown("### 🎬 Generate Your Reel")
         
         if st.button("🚀 Create Instagram Reel", type="primary", use_container_width=True):
-            with st.spinner("Step 2: Analyzing images with BERT5..."):
-                # Analyze sentiment for all images
-                analysis_results = []
-                progress_bar = st.progress(0)
+            with st.spinner("Step 2: Analyzing all images together with BERT5..."):
+                # Analyze all images together for overall sentiment and context
+                all_images = [Image.open(uploaded_file) for uploaded_file in uploaded_files]
                 
-                for i, uploaded_file in enumerate(uploaded_files):
+                # Get overall sentiment and context for all images combined
+                overall_sentiment, overall_context = st.session_state.sentiment_analyzer.analyze_images_together(all_images)
+                
+                # Get matching prompt from RAG database
+                overall_prompt = st.session_state.rag_database.get_matching_prompt(overall_sentiment, overall_context)
+                
+                # Create analysis results with the same structure but using overall analysis
+                analysis_results = []
+                for uploaded_file in uploaded_files:
                     image = Image.open(uploaded_file)
-                    
-                    # Get sentiment and context
-                    sentiment, context = st.session_state.sentiment_analyzer.analyze_image(image)
-                    
-                    # Get matching prompt from RAG
-                    prompt = st.session_state.rag_database.get_matching_prompt(sentiment, context)
-                    
                     analysis_results.append({
                         'image': image,
-                        'sentiment': sentiment,
-                        'context': context,
-                        'prompt': prompt
+                        'sentiment': overall_sentiment,
+                        'context': overall_context,
+                        'prompt': overall_prompt
                     })
-                    
-                    progress_bar.progress((i + 1) / len(uploaded_files))
                 
-                st.success("✅ Step 2 Complete: Context generated from BERT5 model")
+                st.success("✅ Step 2 Complete: Overall context generated from BERT5 model")
+                
+                # Display overall sentiment analysis results
+                st.markdown("#### 🧠 Overall Sentiment Analysis")
+                with st.container():
+                    st.markdown(f"🎭 **Overall Sentiment:** {overall_sentiment}")
+                    st.markdown(f"📝 **Overall Context:** {overall_context}")
+                    st.markdown(f"🎯 **Matched Prompt:** {overall_prompt}")
+                    st.markdown("---")
             
             with st.spinner("Step 3: Finding appropriate prompt from RAG database..."):
                 st.success("✅ Step 3 Complete: Best prompts matched from RAG database")
@@ -368,9 +353,9 @@ def main():
                     # Generate video
                     video_path = st.session_state.video_generator.create_reel(
                         analysis_results,
-                        music_style=selected_music,
+                        music_style="Upbeat",  # Default music style
                         duration=duration,
-                        style=video_style
+                        style="Modern"  # Default video style
                     )
                     
                     if video_path:

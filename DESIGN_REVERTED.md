@@ -80,3 +80,4 @@ The app is now running at `http://localhost:8501` with:
 - **Blue Theme**: Consistent color scheme
 - **Professional Look**: Clean, modern interface
 - **Better Readability**: Clear contrast and typography
+

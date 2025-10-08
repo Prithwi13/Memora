@@ -142,4 +142,81 @@ class SentimentAnalyzer:
                 context += " with cool blue tones"
         
         return sentiment, context
+    
+    def analyze_images_together(self, images):
+        """
+        Analyze multiple images together to get overall sentiment and context
+        Returns: (overall_sentiment, overall_context)
+        """
+        try:
+            if not images:
+                return "Neutral", "No images provided"
+            
+            # Analyze each image individually first
+            individual_analyses = []
+            for image in images:
+                sentiment, context = self.analyze_image(image)
+                individual_analyses.append((sentiment, context))
+            
+            # Combine the analyses to get overall sentiment and context
+            sentiments = [analysis[0] for analysis in individual_analyses]
+            contexts = [analysis[1] for analysis in individual_analyses]
+            
+            # Determine overall sentiment (majority vote)
+            positive_count = sentiments.count("Positive")
+            negative_count = sentiments.count("Negative")
+            neutral_count = sentiments.count("Neutral")
+            
+            if positive_count >= negative_count and positive_count >= neutral_count:
+                overall_sentiment = "Positive"
+            elif negative_count >= positive_count and negative_count >= neutral_count:
+                overall_sentiment = "Negative"
+            else:
+                overall_sentiment = "Neutral"
+            
+            # Combine contexts into overall context
+            overall_context = self._combine_contexts(contexts, overall_sentiment)
+            
+            return overall_sentiment, overall_context
+            
+        except Exception as e:
+            st.warning(f"Error in combined analysis: {e}")
+            return "Neutral", "Error analyzing images together"
+    
+    def _combine_contexts(self, contexts, overall_sentiment):
+        """Combine individual contexts into an overall context description"""
+        # Extract key themes from all contexts
+        all_words = []
+        for context in contexts:
+            words = context.lower().split()
+            all_words.extend(words)
+        
+        # Find common themes
+        word_counts = {}
+        for word in all_words:
+            if len(word) > 3:  # Only consider meaningful words
+                word_counts[word] = word_counts.get(word, 0) + 1
+        
+        # Get most common themes
+        common_themes = sorted(word_counts.items(), key=lambda x: x[1], reverse=True)[:5]
+        theme_words = [word for word, count in common_themes]
+        
+        # Create overall context based on sentiment and themes
+        if overall_sentiment == "Positive":
+            if "bright" in theme_words or "colorful" in theme_words:
+                return f"vibrant collection with bright, colorful scenes and uplifting energy"
+            elif "natural" in theme_words or "clean" in theme_words:
+                return f"clean, natural collection with fresh, positive vibes"
+            else:
+                return f"positive collection with cheerful and uplifting content"
+        elif overall_sentiment == "Negative":
+            if "dark" in theme_words or "moody" in theme_words:
+                return f"dramatic collection with dark, moody atmospheres and intense emotions"
+            else:
+                return f"intense collection with powerful, dramatic content"
+        else:
+            if "natural" in theme_words or "balanced" in theme_words:
+                return f"balanced collection with natural, professional scenes and clean aesthetics"
+            else:
+                return f"professional collection with clean, modern content and balanced composition"
 

@@ -90,3 +90,4 @@ The app is now running at `http://localhost:8501` with:
 - **Upload**: Kept the improved single upload area
 - **Theme**: Blue gradients and colors throughout
 - **UX**: Much cleaner upload experience
+

@@ -71,3 +71,4 @@ The app is now running at `http://localhost:8501` with:
 - **Better Error Handling**: Graceful fallbacks for audio issues
 - **Volume Control**: Proper audio level management
 - **Auto-Looping**: Seamless music integration
+

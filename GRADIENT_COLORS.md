@@ -127,3 +127,4 @@ The app is now running at `http://localhost:8501` with:
 - **Modern Design**: 2025 trending aesthetic
 - **Consistent Theme**: Unified color palette
 - **Engaging UX**: Captivating visual effects
+
