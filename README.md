@@ -1,89 +1,106 @@
-🎬 Memora AI Cinematic Generator
-🧠 Overview
+# 🎬 Memora AI Instagram Reel Generator
 
-HackUTA AI Cinematic Generator is an advanced AI-powered Flask application that transforms static images into dynamic cinematic videos.
-The system integrates BERT5, Gemini 2.5 Flash, and a Retrieval-Augmented Generation (RAG) Database to intelligently generate emotional, context-driven video stories — complete with visuals, transitions, and background audio.
+## 🧠 Overview
 
-🚀 Workflow
-📸 Photo Upload
-↓
-🤖 BERT5 Model
-→ Extracts sentiment, mood, and contextual meaning from uploaded images
-↓
-🧠 RAG Database
-→ Matches extracted context to the most suitable specialized prompt
-↓
-✨ Gemini 2.5 Flash (Image Generation)
-→ Generates stylized cinematic frames from refined prompts and images
-↓
-🎞️ MoviePy
-→ Combines all generated frames, transitions, and audio into a final MP4 video
+Memora is an advanced AI-powered **Streamlit** application that transforms static images into dynamic Instagram reels with AI narration.
+The system integrates BERT5, Gemini 2.5 Flash, and a Retrieval-Augmented Generation (RAG) Database to intelligently generate emotional, context-driven video stories — complete with visuals, transitions, background music, and AI narration.
 
-➡️ Final Output: A complete cinematic video stored in the outputs/ folder.
+## 🚀 Workflow
 
-⚙️ Features
+1. **📸 Photo Upload** → User uploads multiple images
+2. **🤖 BERT5 Analysis** → Extracts sentiment, mood, and contextual meaning from all images together
+3. **🧠 RAG Database** → Matches extracted context to the most suitable specialized prompt
+4. **✨ Gemini 2.5 Flash** → Generates video script and narration based on analysis
+5. **🎤 AI Narration** → Creates voice-over using Hugging Face TTS models
+6. **🎞️ MoviePy** → Combines images, transitions, background music, and narration into final MP4
 
-🧩 AI-Powered Context Extraction: Uses BERT5 to understand emotion, tone, and meaning from multiple images together.
+**➡️ Final Output:** A complete Instagram reel with AI narration ready for download.
 
-🧠 Intelligent RAG Matching: Dynamically selects prompts that align with detected sentiment and visual content.
+## ⚙️ Features
 
-🎨 Gemini 2.5 Flash Integration: Produces artistic, frame-level cinematic imagery guided by the selected prompt.
+- **🧩 AI-Powered Context Extraction**: Uses BERT5 to understand emotion, tone, and meaning from multiple images together
+- **🧠 Intelligent RAG Matching**: Dynamically selects prompts that align with detected sentiment and visual content
+- **🎨 Gemini 2.5 Flash Integration**: Generates video scripts and narration based on image analysis
+- **🎤 AI Narration**: Creates realistic voice-over using Hugging Face SpeechT5 TTS models
+- **🎬 Automatic Video Composition**: Uses MoviePy to combine images, transitions, music, and narration
+- **🌐 Streamlit Web Interface**: Clean, modern interface for easy image upload and video generation
+- **🎵 Background Music**: Multiple music styles with automatic audio mixing
+- **📱 Instagram-Ready**: Optimized for social media with proper aspect ratios and durations
 
-🎬 Automatic Video Composition: Uses MoviePy to combine generated visuals and sound into a cohesive short film.
-
-🌐 Web Interface via Flask: Intuitive interface to upload images and preview generated results locally.
-
-🏗️ Project Structure
-hackuta-main/
+## 🏗️ Project Structure
+```
+memora/
 │
-├── app.py # Flask main application
-├── config.py # Config settings for API and model paths
-├── rag*database.json # RAG database with specialized prompts
-├── requirements.txt # Python dependencies
+├── app.py                    # Streamlit main application
+├── config.py                 # API key configuration
+├── sentiment_analyzer.py      # BERT5 sentiment analysis
+├── rag_database.py           # RAG database for prompt matching
+├── video_generator.py        # Gemini + MoviePy video creation
+├── ai_narrator.py            # AI narration with TTS
+├── requirements.txt           # Python dependencies
 │
-├── templates/ # Frontend HTML templates
-├── static/ # Static assets (CSS, JS, etc.)
-├── uploads/ # Temporary image uploads
-├── outputs/ # Generated MP4 video outputs
-│
-├── services/ # Internal services for AI processing
-└── test*\*.py # Test scripts for components
+├── assets/
+│   └── music/                # Background music files
+├── .env.example              # Environment variables template
+├── .gitignore               # Git ignore rules
+└── README.md                # This file
+```
 
 ⚙️ Setup Instructions
 
 1. Clone the repository
-   git clone https://github.com/yourusername/hackuta-main.git
-   cd hackuta-main
+   ```bash
+   git clone https://github.com/yourusername/memora.git
+   cd memora
+   ```
 
 2. Install dependencies
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-Make sure Python 3.9+ is installed:
+3. Set up environment variables
+   ```bash
+   # Copy the example environment file
+   cp .env.example .env
+   
+   # Edit .env and add your Gemini API key
+   # Get your API key from: https://aistudio.google.com/
+   GEMINI_API_KEY=your_actual_api_key_here
+   ```
 
-pip install -r requirements.txt
+4. Run the application
+   ```bash
+   streamlit run app.py
+   ```
 
-3. Run the application
-   python3 app.py
+   App will run on 👉 http://localhost:8501
 
-App will run on
-👉 http://localhost:5003
+⚠️ **Important:** Never commit your `.env` file to version control!
 
-🧠 Tech Stack
-Component Technology
-Frontend Flask, HTML, CSS, JavaScript
-Backend Python
-AI Models BERT5 (sentiment/context extraction)
-Retrieval System RAG (specialized cinematic prompts)
-Image Generation Gemini 2.5 Flash
-Video Rendering MoviePy
-Storage Local filesystem (uploads/outputs)
-📦 Output
+## 🧠 Tech Stack
 
-Generated cinematic videos are saved in:
+| Component | Technology |
+|-----------|------------|
+| **Frontend** | Streamlit, HTML, CSS |
+| **Backend** | Python |
+| **AI Models** | BERT5 (sentiment analysis), Gemini 2.5 Flash (script generation) |
+| **TTS** | Hugging Face SpeechT5 |
+| **Retrieval System** | RAG with ChromaDB |
+| **Video Rendering** | MoviePy |
+| **Audio Processing** | FFmpeg, SoundFile |
 
-outputs/
+## 📦 Output
 
-<<<<<<< HEAD
+Generated Instagram reels are automatically downloaded as MP4 files with:
+- **AI-generated narration**
+- **Background music**
+- **Smooth transitions**
+- **Instagram-optimized format**
 
-=======
-Each file is named automatically (e.g., generated_video_001.mp4).
->>>>>>> bb19e5a32d9145ada5b49a6a8e13029650842ab6
+## 🔐 Security
+
+- ✅ No hardcoded API keys
+- ✅ Environment variable configuration
+- ✅ Secure `.gitignore` setup
+- ✅ Clear setup instructions for users
